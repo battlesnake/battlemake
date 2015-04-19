@@ -19,6 +19,8 @@ var identity = require('gulp-identity');
 var plumber = require('gulp-plumber');
 var sourcemaps = require('gulp-sourcemaps');
 var Browserify = require('browserify');
+var debowerify = require('debowerify');
+var deamdify = require('deamdify');
 var jshint = require('gulp-jshint');
 var jshintReporter = require('jshint-stylish-source');
 var source = require('vinyl-source-stream');
@@ -97,6 +99,8 @@ gulp.task('js-client', function () {
 		.external(dependencies)
 		.transform(envify)
 		.transform(ngAnnotate)
+		.transform(debowerify)
+		.transform(deamdify)
 		.plugin(minifyifyConditional, {
 			map: config.bundles.clientMap,
 			output: path.join(config.paths.out, config.bundles.clientMap)
