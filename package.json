@@ -1,14 +1,17 @@
 {
   "name": "battlemake",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Front-end build system with web server and watchers, using jade+browserify+less+webfonts.",
   "main": "index.js",
   "dependencies": {
     "browserify": "^9.0.8",
     "browserify-ngannotate": "^0.7.1",
+    "browserify-shim": "^3.8.5",
     "chalk": "^1.0.0",
     "compression": "^1.4.3",
     "connect": "^3.3.5",
+    "deamdify": "^0.1.1",
+    "debowerify": "^1.2.0",
     "del": "^1.1.1",
     "envify": "^3.4.0",
     "gulp": "^3.8.11",
@@ -33,13 +36,11 @@
     "lodash": "^3.6.0",
     "minifyify": "^6.4.0",
     "node-notifier": "^4.2.1",
+    "run-sequence": "^1.0.2",
     "serve-static": "^1.9.2",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.1.1",
-    "browserify-shim": "^3.8.5",
-    "deamdify": "^0.1.1",
-    "debowerify": "^1.2.0"
+    "watchify": "^3.1.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

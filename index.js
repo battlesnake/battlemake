@@ -4,6 +4,25 @@ module.exports = generateBuildSystem;
 
 function generateBuildSystem(config) {
 
+var gulp = require('gulp');
+
+gulp.task('default', ['test']);
+gulp.task('build', ['js', 'css', 'html', 'modules']);
+gulp.task('rebuild', rebuildTask);
+gulp.task('html', ['jade']);
+gulp.task('css', ['less']);
+gulp.task('js', ['js-vendor', 'js-client']);
+gulp.task('test', ['rebuild', 'serve']);
+gulp.task('js-vendor', jsVendorTask);
+gulp.task('js-client', jsClientTask);
+gulp.task('jade', jadeTask);
+gulp.task('less', ['webfonts'], lessTask);
+gulp.task('webfonts', webfontsTask);
+gulp.task('modules', modulesTask);
+gulp.task('lint', lintTask);
+gulp.task('serve', serveTask);
+gulp.task('clean', cleanTask);
+
 var live = isSet('live');
 var watching = !live;
 
@@ -11,12 +30,12 @@ var path = require('path');
 var assign = require('lodash').assign;
 var del = require('del');
 var chalk = require('chalk');
-var gulp = require('gulp');
 var notifier = require('node-notifier');
 var util = require('gulp-util');
 var gif = require('gulp-if');
 var identity = require('gulp-identity');
 var plumber = require('gulp-plumber');
+var series = require('run-sequence');
 var sourcemaps = require('gulp-sourcemaps');
 var Browserify = require('browserify');
 var debowerify = require('debowerify');
@@ -61,17 +80,11 @@ var dependencies = Object.keys(config.dependencies)
 	})
 	.sort();	
 
-gulp.task('default', ['build']);
+function rebuildTask(cb) {
+	series('clean', 'build', cb);
+}
 
-gulp.task('build', ['js', 'css', 'html', 'modules']);
-
-gulp.task('html', ['jade']);
-gulp.task('css', ['less']);
-gulp.task('js', ['js-vendor', 'js-client']);
-
-gulp.task('test', ['default', 'serve']);
-
-gulp.task('js-vendor', function () {
+function jsVendorTask() {
 	return new Browserify({ debug: false })
 		.require(dependencies)
 		.bundle()
@@ -81,9 +94,9 @@ gulp.task('js-vendor', function () {
 		.pipe(gif(live, uglify()))
 		.pipe(gulp.dest(config.paths.out))
 		;
-});
+}
 
-gulp.task('js-client', function () {
+function jsClientTask() {
 	/* Only minify client bundle if doing build for live */
 	var minifyifyConditional = live ? minifyify : function (a) { return a; };
 
@@ -134,9 +147,9 @@ gulp.task('js-client', function () {
 	function onError(err) {
 		errorReporter(err);
 	}
-});
+}
 
-gulp.task('jade', function () {
+function jadeTask() {
 	if (watching) {
 		gulp.watch(config.globs.jade, ['jade']);
 	}
@@ -146,9 +159,9 @@ gulp.task('jade', function () {
 		.pipe(jade({ pretty: !live }))
 		.pipe(gulp.dest(config.paths.out))
 		;
-});
+}
 
-gulp.task('less', ['webfonts'], function () {
+function lessTask() {
 	var opts = { relativeUrls: true };
 	if (watching) {
 		gulp.watch(config.globs.less, ['less']);
@@ -160,9 +173,9 @@ gulp.task('less', ['webfonts'], function () {
 		.pipe(gif(live, minifyCss()))
 		.pipe(gulp.dest(config.paths.out))
 		;
-});
+}
 
-gulp.task('webfonts', function () {
+function webfontsTask() {
 	if (watching) {
 		gulp.watch(config.fonts, ['webfonts']);
 	}
@@ -171,24 +184,24 @@ gulp.task('webfonts', function () {
 		.pipe(fonts())
 		.pipe(gulp.dest(config.paths.out))
 		;
-});
+}
 
-gulp.task('modules', function () {
+function modulesTask() {
 	return gulp.src(config.globs.npmAssets, { base: './', buffer: false })
 		.pipe(errorHandler())
 		.pipe(gulp.dest(config.paths.out))
 		;
-});
+}
 
-gulp.task('lint', function () {
+function lintTask() {
 	return gulp.src(['*.js', '**/*.js', '!node_modules/**', '!bower_components/**', '!' + config.paths.out + '/**'])
 		.pipe(errorHandler())
 		.pipe(jshint())
 		.pipe(jshint.reporter(jshintReporter))
 		;
-});
+}
 
-gulp.task('serve', function () {
+function serveTask() {
 	var http = require('http');
 	var connect = require('connect');
 	var compression = require('compression');
@@ -199,10 +212,10 @@ gulp.task('serve', function () {
 	util.log('Starting HTTP server on port ' + chalk.cyan(config.test.port));
 	http.createServer(app)
 		.listen(config.test.port);
-});
+}
 
-gulp.task('clean', function (cb) {
+function cleanTask(cb) {
 	del(config.paths.out, cb);
-});
+}
 
 }
