@@ -7,7 +7,7 @@ function generateBuildSystem(config) {
 var gulp = require('gulp');
 
 gulp.task('default', ['test']);
-gulp.task('build', ['js', 'css', 'html', 'modules']);
+gulp.task('build', ['js', 'css', 'html']);
 gulp.task('rebuild', rebuildTask);
 gulp.task('html', ['jade']);
 gulp.task('css', ['less']);
@@ -16,7 +16,7 @@ gulp.task('test', ['rebuild', 'serve']);
 gulp.task('js-vendor', jsVendorTask);
 gulp.task('js-client', jsClientTask);
 gulp.task('jade', jadeTask);
-gulp.task('less', ['webfonts'], lessTask);
+gulp.task('less', ['webfonts', 'modules'], lessTask);
 gulp.task('webfonts', webfontsTask);
 gulp.task('modules', modulesTask);
 gulp.task('lint', lintTask);
@@ -50,6 +50,7 @@ var minifyify = require('minifyify');
 var ngAnnotate = require('browserify-ngannotate');
 var less = require('gulp-less');
 var minifyCss = require('gulp-minify-css');
+var base64 = require('gulp-base64');
 var jade = require('gulp-jade');
 var fonts = require('gulp-google-webfonts');
 var rename = require('gulp-rename');
@@ -166,10 +167,16 @@ function lessTask() {
 	if (watching) {
 		gulp.watch(config.globs.less, ['less']);
 	}
+	var base64opts = {
+		debug: false,
+		extensions: config.base64.includeExtensions,
+		maxImageSize: config.base64.maxImageSize
+	};
 	return gulp.src(config.globs.less)
 		.pipe(errorHandler())
 		.pipe(watchLess(config.globs.less, opts))
 		.pipe(less(opts))
+		.pipe(gif(config.base64.enabled, base64(base64opts)))
 		.pipe(gif(live, minifyCss()))
 		.pipe(gulp.dest(config.paths.out))
 		;
