@@ -165,13 +165,13 @@ function jadeTask() {
 				.on('error', errorReporter);
 	}
 	var dataGetter =
-		(config.jadeContext instanceof Function) ? config.jadeContext :
-		(config.jadeContext !== undefined) ? function () { return config.jadeContext; } :
-		undefined;
+		(config.jadeContext instanceof Function) ? data(config.jadeContext) :
+		(config.jadeContext !== undefined) ? data(function (file) { return config.jadeContext; }) :
+		identity();
 	return gulp.src(config.globs.jade)
 		.pipe(errorHandler())
 //		.pipe(watchJade())
-		.pipe(gif(dataGetter, data(dataGetter)))
+		.pipe(dataGetter)
 		.pipe(jade({ pretty: !live, locals: config.jadeContext }))
 		.pipe(gulp.dest(config.paths.out))
 		;
