@@ -79,7 +79,7 @@ var dependencies = Object.keys(config.dependencies)
 		return !config.jsFreeDependencies ||
 			config.jsFreeDependencies.indexOf(name) === -1;
 	})
-	.sort();	
+	.sort();
 
 function rebuildTask(cb) {
 	series('clean', 'build', cb);
@@ -157,7 +157,7 @@ function jadeTask() {
 	return gulp.src(config.globs.jade)
 		.pipe(errorHandler())
 		.pipe(watchJade())
-		.pipe(jade({ pretty: !live }))
+		.pipe(jade({ pretty: !live, locals: config.jadeContext }))
 		.pipe(gulp.dest(config.paths.out))
 		;
 }
