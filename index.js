@@ -56,6 +56,7 @@ var base64 = require('gulp-base64');
 var jade = require('gulp-jade');
 var fonts = require('gulp-google-webfonts');
 var rename = require('gulp-rename');
+var data = require('gulp-data');
 var watch = watching ? require('gulp-watch') : gulp.src.bind(gulp);
 var watchify = watching ? require('watchify') : function (brows) { return brows; };
 var watchLess = watching ? require('gulp-watch-less') : identity;
@@ -163,10 +164,15 @@ function jadeTask() {
 			gulp.watch(toWatch, ['jade'])
 				.on('error', errorReporter);
 	}
+	var dataGetter =
+		(config.jadeContext instanceof Function) ? data(config.jadeContext) :
+		(config.jadeContext !== undefined) ? data(function (file) { return config.jadeContext; }) :
+		identity();
 	return gulp.src(config.globs.jade)
 		.pipe(errorHandler())
 //		.pipe(watchJade())
-		.pipe(jade({ pretty: !live, locals: config.jadeContext }))
+		.pipe(dataGetter)
+		.pipe(jade({ pretty: !live }))
 		.pipe(gulp.dest(config.paths.out))
 		;
 }
