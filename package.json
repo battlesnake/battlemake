@@ -1,6 +1,6 @@
 {
   "name": "battlemake",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Front-end build system with web server and watchers, using jade+browserify+less+webfonts.",
   "main": "index.js",
   "dependencies": {

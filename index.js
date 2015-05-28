@@ -152,22 +152,26 @@ function jsClientTask() {
 	}
 }
 
+var jadeWatch;
 function jadeTask() {
+	var toWatch = (config.globs.jadeDeps || []).concat(config.globs.jade);
 	if (watching) {
-		gulp.watch(config.globs.jade, ['jade']);
+		jadeWatch = jadeWatch || gulp.watch(toWatch, ['jade']);
 	}
 	return gulp.src(config.globs.jade)
 		.pipe(errorHandler())
-		.pipe(watchJade())
+//		.pipe(watchJade())
 		.pipe(jade({ pretty: !live, locals: config.jadeContext }))
 		.pipe(gulp.dest(config.paths.out))
 		;
 }
 
+var lessWatch;
 function lessTask() {
 	var opts = { relativeUrls: true };
+	var toWatch = (config.globs.lessDeps || []).concat(config.globs.less);
 	if (watching) {
-		gulp.watch(config.globs.less, ['less']);
+		lessWatch = lessWatch || gulp.watch(toWatch, ['less']);
 	}
 	var base64opts = {
 		debug: false,
@@ -176,7 +180,7 @@ function lessTask() {
 	};
 	return gulp.src(config.globs.less)
 		.pipe(errorHandler())
-		.pipe(watchLess(config.globs.less, { name: 'LESS', less: opts }))
+//		.pipe(watchLess(toWatch, { name: 'LESS', less: opts }))
 		.pipe(less(opts))
 		.pipe(gif(config.base64.enabled, base64(base64opts)))
 		.pipe(gif(live, minifyCss()))
