@@ -69,6 +69,9 @@ var errorReporter = function (error) {
 	error = String(error);
 	util.log(chalk.yellow(error));
 	notifier.notify({ title: 'Build failed', message: error });
+	if (this && this.emit) {
+		this.emit('end');
+	}
 };
 
 var errorHandler = function () {
@@ -156,7 +159,9 @@ var jadeWatch;
 function jadeTask() {
 	var toWatch = (config.globs.jadeDeps || []).concat(config.globs.jade);
 	if (watching) {
-		jadeWatch = jadeWatch || gulp.watch(toWatch, ['jade']);
+		jadeWatch = jadeWatch ||
+			gulp.watch(toWatch, ['jade'])
+				.on('error', errorReporter);
 	}
 	return gulp.src(config.globs.jade)
 		.pipe(errorHandler())
@@ -171,7 +176,9 @@ function lessTask() {
 	var opts = { relativeUrls: true };
 	var toWatch = (config.globs.lessDeps || []).concat(config.globs.less);
 	if (watching) {
-		lessWatch = lessWatch || gulp.watch(toWatch, ['less']);
+		lessWatch = lessWatch ||
+			gulp.watch(toWatch, ['less'])
+				.on('error', errorReporter);
 	}
 	var base64opts = {
 		debug: false,
