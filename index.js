@@ -6,8 +6,10 @@ function generateBuildSystem(config) {
 
 var gulp = require('gulp');
 
+var buildTasks = ['js', 'css', 'html'].concat(config.extraTasks || []);
+
 gulp.task('default', ['test']);
-gulp.task('build', ['js', 'css', 'html']);
+gulp.task('build', buildTasks);
 gulp.task('rebuild', rebuildTask);
 gulp.task('html', ['jade']);
 gulp.task('css', ['less']);

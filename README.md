@@ -8,6 +8,8 @@ stylesheets, Jade for templates, and Browserify for JavaScript.
 # Example usage
 
     var config = {
+		/* Names of extra tasks to run during build step */
+		extraTasks: [],
     	paths: {
 			/* Relative path to output directory */
     		out: 'out'
