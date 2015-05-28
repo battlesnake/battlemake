@@ -176,18 +176,13 @@ function lessTask() {
 	};
 	return gulp.src(config.globs.less)
 		.pipe(errorHandler())
-		.pipe(watchLess(config.globs.less, { name: 'LESS', less: opts }, onChange))
+		.pipe(watchLess(config.globs.less, { name: 'LESS', less: opts }))
 		.pipe(less(opts))
 		.pipe(gif(config.base64.enabled, base64(base64opts)))
 		.pipe(gif(live, minifyCss()))
 		.pipe(rename(config.bundles.styles))
 		.pipe(gulp.dest(config.paths.out))
 		;
-
-	function onChange(events, done) {
-		done();
-		process.nextTick(lessTask);
-	}
 }
 
 function webfontsTask() {
