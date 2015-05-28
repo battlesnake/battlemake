@@ -178,6 +178,7 @@ function lessTask() {
 		.pipe(less(opts))
 		.pipe(gif(config.base64.enabled, base64(base64opts)))
 		.pipe(gif(live, minifyCss()))
+		.pipe(rename(config.bundles.styles))
 		.pipe(gulp.dest(config.paths.out))
 		;
 }
