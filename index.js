@@ -35,6 +35,7 @@ var chalk = require('chalk');
 var notifier = require('node-notifier');
 var util = require('gulp-util');
 var gif = require('gulp-if');
+var ignore = require('gulp-ignore');
 var identity = require('gulp-identity');
 var plumber = require('gulp-plumber');
 var series = require('run-sequence');
@@ -42,6 +43,7 @@ var sourcemaps = require('gulp-sourcemaps');
 var Browserify = require('browserify');
 var debowerify = require('debowerify');
 var deamdify = require('deamdify');
+var strictify = require('strictify');
 var jshint = require('gulp-jshint');
 var jshintReporter = require('jshint-stylish-source');
 var source = require('vinyl-source-stream');
@@ -103,7 +105,15 @@ function jsVendorTask() {
 		;
 }
 
+var jsClientWatch;
 function jsClientTask() {
+	var toWatch = config.globs.jsClientDeps || [];
+	if (watching) {
+		jsClientWatch = jsClientWatch ||
+			gulp.watch(toWatch, ['js-client'])
+				.on('error', errorReporter);
+	}
+
 	/* Only minify client bundle if doing build for live */
 	var minifyifyConditional = live ? minifyify : function (a) { return a; };
 
@@ -118,6 +128,7 @@ function jsClientTask() {
 	var bundler = new Browserify(opts)
 		.external(dependencies)
 		.transform(envify)
+		.transform(strictify)
 		.transform(ngAnnotate)
 		.transform(debowerify)
 		.transform(deamdify)
@@ -214,14 +225,18 @@ function webfontsTask() {
 }
 
 function modulesTask() {
+	var exclude = config.globs.npmAssetsExclude ? ignore.exclude(config.globs.npmAssetsExclude) : identity;
 	return gulp.src(config.globs.npmAssets, { base: './', buffer: false })
+		.pipe(exclude)
 		.pipe(errorHandler())
 		.pipe(gulp.dest(config.paths.out))
 		;
 }
 
 function lintTask() {
+	var exclude = config.globs.lineExclude ? ignore.exclude(config.globs.lintExclude) : identity;
 	return gulp.src(['*.js', '**/*.js', '!node_modules/**', '!bower_components/**', '!' + config.paths.out + '/**'])
+		.pipe(exclude)
 		.pipe(errorHandler())
 		.pipe(jshint())
 		.pipe(jshint.reporter(jshintReporter))

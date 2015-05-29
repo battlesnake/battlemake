@@ -1,6 +1,6 @@
 {
   "name": "battlemake",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Front-end build system with web server and watchers, using jade+browserify+less+webfonts.",
   "main": "index.js",
   "dependencies": {
@@ -20,6 +20,7 @@
     "gulp-google-webfonts": "*",
     "gulp-identity": "*",
     "gulp-if": "*",
+    "gulp-ignore": "^1.2.1",
     "gulp-jade": "*",
     "gulp-jade-find-affected": "*",
     "gulp-jshint": "*",
@@ -40,6 +41,7 @@
     "node-notifier": "*",
     "run-sequence": "^1.1.0",
     "serve-static": "^1.9.3",
+    "strictify": "^0.2.0",
     "vinyl-buffer": "*",
     "vinyl-source-stream": "*",
     "watchify": "^3.2.1"
