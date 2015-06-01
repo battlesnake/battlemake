@@ -24,7 +24,6 @@
     "gulp-if": "*",
     "gulp-ignore": "^1.2.1",
     "gulp-jade": "*",
-    "gulp-jade-find-affected": "*",
     "gulp-jshint": "*",
     "gulp-less": "*",
     "gulp-minify-css": "^1.1.1",
@@ -33,7 +32,6 @@
     "gulp-uglify": "*",
     "gulp-util": "*",
     "gulp-watch": "*",
-    "gulp-watch-less": "*",
     "jade": "^1.10.0",
     "jshint-stylish-source": "*",
     "less": "^2.5.1",
@@ -45,8 +43,7 @@
     "serve-static": "^1.9.3",
     "strictify": "^0.2.0",
     "vinyl-buffer": "*",
-    "vinyl-source-stream": "*",
-    "watchify": "^3.2.1"
+    "vinyl-source-stream": "*"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
