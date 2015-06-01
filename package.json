@@ -36,6 +36,7 @@
     "jade": "^1.10.0",
     "jshint-stylish-source": "*",
     "less": "^2.5.1",
+    "less-plugin-functions": "battlesnake/less-plugin-functions",
     "lodash": "^3.9.3",
     "minifyify": "^7.0.0",
     "node-notifier": "*",

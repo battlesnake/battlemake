@@ -2,7 +2,26 @@
 
 module.exports = generateBuildSystem;
 
+// Until issue #538 in less is resolved
+function patchLess() {
+	var less = require('less');
+	var Funcplug = require('less-plugin-functions') ;
+	var oldRender = less.render;
+	less.render = function () {
+		var args = [].slice.apply(arguments);
+		if (args.length < 2) {
+			args.push({});
+		}
+		var options = args[1];
+		options.plugins = options.plugins || [];
+		options.plugins.unshift(new Funcplug({}));
+		return oldRender.apply(less, args);
+	};
+}
+
 function generateBuildSystem(config) {
+
+patchLess();
 
 var gulp = require('gulp');
 
@@ -122,10 +141,9 @@ function jsClientTask() {
 		debug: true,
 		fullPaths: true
 	};
-	opts = assign(opts, watchify.args);
+//	opts = assign(opts, watchify.args);
 
-	/* Client bundle configuration */
-	var bundler = new Browserify(opts)
+	return new Browserify(opts)
 		.external(dependencies)
 		.transform(envify)
 		.transform(strictify)
@@ -136,35 +154,56 @@ function jsClientTask() {
 			map: config.bundles.clientMap,
 			output: path.join(config.paths.out, config.bundles.clientMap)
 		})
+		.bundle()
+		.on('error', errorReporter)
+		.pipe(source(config.bundles.client))
+		.pipe(buffer())
+		.pipe(sourcemaps.init({ loadMaps: true }))
+		.pipe(sourcemaps.write('./'))
+		.pipe(gulp.dest(config.paths.out))
 		;
 
-	bundler = watchify(bundler, { poll: 300, delay: 300 })
-		.on('update', onUpdate)
-		.on('time', onUpdateComplete)
-		;
-
-	return onUpdate();
-
-	function onUpdate(ids) {
-		util.log('Browserifying' + (ids ? ': ' + ids.map(function (s) { return chalk.cyan(s); }).join(', ') : '...'));
-		return bundler
-			.bundle()
-			.on('error', onError)
-			.pipe(source(config.bundles.client))
-			.pipe(buffer())
-			.pipe(sourcemaps.init({ loadMaps: true }))
-			.pipe(sourcemaps.write('./'))
-			.pipe(gulp.dest(config.paths.out))
-			;
-	}
-
-	function onUpdateComplete(time) {
-		util.log(chalk.underline('Browserified in ' + chalk.magenta(time) + ' ms'));
-	}
-
-	function onError(err) {
-		errorReporter(err);
-	}
+	/* Client bundle configuration */
+//	var bundler = new Browserify(opts)
+//		.external(dependencies)
+//		.transform(envify)
+//		.transform(strictify)
+//		.transform(ngAnnotate)
+//		.transform(debowerify)
+//		.transform(deamdify)
+//		.plugin(minifyifyConditional, {
+//			map: config.bundles.clientMap,
+//			output: path.join(config.paths.out, config.bundles.clientMap)
+//		})
+//		;
+//
+//	bundler = watchify(bundler, { poll: 300, delay: 300 })
+//		.on('update', onUpdate)
+//		.on('time', onUpdateComplete)
+//		;
+//
+//	return onUpdate();
+//
+//	function onUpdate(ids) {
+//		util.log('Browserifying' + (ids ? ': ' + ids.map(function (s) { return chalk.cyan(s); }).join(', ') : '...'));
+//		return bundler
+//			.bundle()
+//			.on('error', onError)
+//			.pipe(source(config.bundles.client))
+//			.pipe(buffer())
+//			.pipe(sourcemaps.init({ loadMaps: true }))
+//			.pipe(sourcemaps.write('./'))
+//			.pipe(gulp.dest(config.paths.out))
+//			;
+//	}
+//
+//	function onUpdateComplete(time) {
+//		util.log(chalk.underline('Browserified in ' + chalk.magenta(time) + ' ms'));
+//	}
+//
+//	function onError(err) {
+//		errorReporter(err);
+//	}
 }
 
 var jadeWatch;
