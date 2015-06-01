@@ -229,7 +229,7 @@ function jadeTask() {
 
 var lessWatch;
 function lessTask() {
-	var opts = { relativeUrls: true };
+	var opts = { relativeUrls: true, strictUnits: true, strictMath: true };
 	var toWatch = (config.globs.lessDeps || []).concat(config.globs.less);
 	if (watching) {
 		lessWatch = lessWatch ||
