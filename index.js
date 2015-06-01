@@ -70,13 +70,14 @@ var buffer = require('vinyl-buffer');
 var envify = require('envify');
 var uglify = require('gulp-uglify');
 var minifyify = require('minifyify');
+var autoprefix = require('gulp-autoprefixer');
 var ngAnnotate = require('browserify-ngannotate');
 var less = require('gulp-less');
 var minifyCss = require('gulp-minify-css');
 var base64 = require('gulp-base64');
 var jade = require('gulp-jade');
 var fonts = require('gulp-google-webfonts');
-var rename = require('gulp-rename');
+var concat = require('gulp-concat');
 var data = require('gulp-data');
 var watch = watching ? require('gulp-watch') : gulp.src.bind(gulp);
 var watchify = watching ? require('watchify') : function (brows) { return brows; };
@@ -241,13 +242,17 @@ function lessTask() {
 		extensions: config.base64.includeExtensions,
 		maxImageSize: config.base64.maxImageSize
 	};
+	var prefixer = autoprefix({ browsers: ['last 2 versions'], cascade: false });
 	return gulp.src(config.globs.less)
 		.pipe(errorHandler())
 //		.pipe(watchLess(toWatch, { name: 'LESS', less: opts }))
+		.pipe(sourcemaps.init())
 		.pipe(less(opts))
 		.pipe(gif(config.base64.enabled, base64(base64opts)))
+		.pipe(gif(live, prefixer))
 		.pipe(gif(live, minifyCss()))
-		.pipe(rename(config.bundles.styles))
+		.pipe(concat(config.bundles.styles))
+		.pipe(sourcemaps.write('.'))
 		.pipe(gulp.dest(config.paths.out))
 		;
 }
