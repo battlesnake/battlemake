@@ -191,17 +191,17 @@ function jadeTask() {
 
 function lessTask() {
 	var opts = { relativeUrls: true, strictUnits: true, strictMath: true };
-	var base64opts = {
+	var base64opts = (config.base64 && config.base64.enabled) ? {
 		debug: false,
 		extensions: config.base64.includeExtensions,
 		maxImageSize: config.base64.maxImageSize
-	};
+	} : null;
 	var prefixer = autoprefix({ browsers: ['last 2 versions'], cascade: false });
 	return gulp.src(config.globs.less)
 		.pipe(errorHandler())
 		.pipe(sourcemaps.init())
 		.pipe(less(opts))
-		.pipe(gif(config.base64.enabled, base64(base64opts)))
+		.pipe(base64opts ? base64(base64opts) : identity())
 		.pipe(gif(live, prefixer))
 		.pipe(gif(live, minifyCss()))
 		.pipe(concat(config.bundles.styles))
@@ -219,7 +219,7 @@ function webfontsTask() {
 }
 
 function modulesTask() {
-	var exclude = config.globs.npmAssetsExclude ? ignore.exclude(config.globs.npmAssetsExclude) : identity;
+	var exclude = config.globs.npmAssetsExclude ? ignore.exclude(config.globs.npmAssetsExclude) : identity();
 	return gulp.src(config.globs.npmAssets, { base: './', buffer: false })
 		.pipe(exclude)
 		.pipe(errorHandler())
@@ -228,7 +228,7 @@ function modulesTask() {
 }
 
 function lintTask() {
-	var exclude = config.globs.lineExclude ? ignore.exclude(config.globs.lintExclude) : identity;
+	var exclude = config.globs.lineExclude ? ignore.exclude(config.globs.lintExclude) : identity();
 	return gulp.src(['*.js', '**/*.js', '!node_modules/**', '!bower_components/**', '!' + config.paths.out + '/**'])
 		.pipe(exclude)
 		.pipe(errorHandler())
